@@ -24,12 +24,69 @@
   		 publisher = {Association for Computational Linguistics}"
 	Size: ~7000 KB
 
+4. Multi-Domain Wizard-of-Oz dataset (MultiWOZ)
+	URL: https://github.com/budzianowski/multiwoz/tree/master/data/MultiWOZ_2.2
+	Citation:
+		"[Budzianowski et al. 2018]
+		 @inproceedings{budzianowski2018large,
+		 	 Author = {Budzianowski, Pawe{\l} and Wen, Tsung-Hsien and Tseng, Bo-Hsiang  and Casanueva, I{\~n}igo and Ultes Stefan and Ramadan Osman and Ga{\v{s}}i\'c, Milica},
+			 title={MultiWOZ - A Large-Scale Multi-Domain Wizard-of-Oz Dataset for Task-Oriented Dialogue Modelling},
+			 booktitle={Proceedings of the 2018 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+			 year={2018}
+		 }
+
+		 [Ramadan et al. 2018]
+		 @inproceedings{ramadan2018large,
+		 title={Large-Scale Multi-Domain Belief Tracking with Knowledge Sharing},
+		 author={Ramadan, Osman and Budzianowski, Pawe{\l} and Gasic, Milica},
+		 booktitle={Proceedings of the 56th Annual Meeting of the Association for Computational Linguistics},
+		 volume={2},
+		 pages={432--437},
+		 year={2018}
+		 }
+
+		 [Eric et al. 2019]
+		 @article{eric2019multiwoz,
+		 title={MultiWOZ 2.1: Multi-Domain Dialogue State Corrections and State Tracking Baselines},
+		 author={Eric, Mihail and Goel, Rahul and Paul, Shachi and Sethi, Abhishek and Agarwal, Sanchit and Gao, Shuyag and Hakkani-Tur, Dilek},
+		 journal={arXiv preprint arXiv:1907.01669},
+		 year={2019}
+		 }
+
+		 [Zang et al. 2020]
+		 @inproceedings{zang2020multiwoz,
+		 title={MultiWOZ 2.2: A Dialogue Dataset with Additional Annotation Corrections and State Tracking Baselines},
+		 author={Zang, Xiaoxue and Rastogi, Abhinav and Sunkara, Srinivas and Gupta, Raghav and Zhang, Jianguo and Chen, Jindong},
+		 booktitle={Proceedings of the 2nd Workshop on Natural Language Processing for Conversational AI, ACL 2020},
+		 pages={109--117},
+		 year={2020}
+		 }"
+	Size: ~190 MB
+
+5. The NPS Chat Corpus
+	URL: http://faculty.nps.edu/cmartell/NPSChat.htm (available from the NLTK library: https://www.nltk.org/)
+	Citation:
+	Size: ?
+
+6. TensorFlow's Conversational Question Answering Challenge (CoQA)
+	URL: https://www.tensorflow.org/datasets/catalog/coqa
+	Citation: 
+		"@misc{reddy2018coqa,
+		 title={CoQA: A Conversational Question Answering Challenge},
+		 author={Siva Reddy and Danqi Chen and Christopher D. Manning},
+		 year={2018},
+		 eprint={1808.07042},
+		 archivePrefix={arXiv},
+		 primaryClass={cs.CL}"
+	Size: ~18.28 MiB
+}
 
 Additional resources:
-1. List of datasets (start at "Dialogue Datasets for Chatbot Training")
+1. List of datasets
 	URL: https://imerit.net/blog/14-best-chatbot-datasets-for-machine-learning-all-pbm/
 2. PolyAI conversational-datasets
 	URL: https://github.com/PolyAI-LDN/conversational-datasets
 3. TREC answers to random questions
 	URL: https://trec.nist.gov/data/qa.html
-
+4. Transformer Chatbot Tutorial with TensorFlow 2.0
+	URL: https://blog.tensorflow.org/2019/05/transformer-chatbot-tutorial-with-tensorflow-2.html
