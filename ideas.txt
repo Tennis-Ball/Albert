@@ -1,0 +1,4 @@
+1. Create NLP text completion transformer model trained on conversation datasets
+2. Use ChatGPT responses for additional data points
+3. Have real conversations with it for more data
+
