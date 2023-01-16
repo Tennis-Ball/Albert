@@ -1,0 +1,35 @@
+1. Meta AI's Casual Conversations Dataset
+	URL: https://ai.facebook.com/datasets/casual-conversations-dataset/
+	Citation: 
+	Size: ~125500 KB
+
+2. CMU's Question-Answer Database
+	URL: http://www.cs.cmu.edu/~ark/QA-data/
+	Citation: 
+		"Noah A. Smith, Michael Heilman, and Rebecca Hwa
+		 Question Generation as a Competitive Undergraduate Course Project
+		 In Proceedings of the NSF Workshop on the Question Generation Shared Task and Evaluation Challenge, Arlington, VA, September 2008. 
+		 Available at: http://www.cs.cmu.edu/~nasmith/papers/smith+heilman+hwa.nsf08.pdf"
+	Size: ~25 MB
+
+3. Microsoft Research WikiQA Corpus
+	URL: https://www.microsoft.com/en-us/download/confirmation.aspx?id=52419
+	Citation:
+		"author    = {Yang, Yi  and  Yih, Wen-tau  and  Meek, Christopher},
+  		 title     = {{WikiQA}: {A} Challenge Dataset for Open-Domain Question Answering},
+  		 booktitle = {Proceedings of the 2015 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+ 	  	 month     = {September},
+  		 year      = {2015},
+  		 address   = {Lisbon, Portugal},
+  		 publisher = {Association for Computational Linguistics}"
+	Size: ~7000 KB
+
+
+Additional resources:
+1. List of datasets (start at "Dialogue Datasets for Chatbot Training")
+	URL: https://imerit.net/blog/14-best-chatbot-datasets-for-machine-learning-all-pbm/
+2. PolyAI conversational-datasets
+	URL: https://github.com/PolyAI-LDN/conversational-datasets
+3. TREC answers to random questions
+	URL: https://trec.nist.gov/data/qa.html
+
