@@ -63,12 +63,7 @@
 		 }"
 	Size: ~190 MB
 
-5. The NPS Chat Corpus
-	URL: http://faculty.nps.edu/cmartell/NPSChat.htm (available from the NLTK library: https://www.nltk.org/)
-	Citation:
-	Size: ?
-
-6. TensorFlow's Conversational Question Answering Challenge (CoQA)
+5. TensorFlow's Conversational Question Answering Challenge (CoQA)
 	URL: https://www.tensorflow.org/datasets/catalog/coqa
 	Citation: 
 		"@misc{reddy2018coqa,
