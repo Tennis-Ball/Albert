@@ -63,8 +63,8 @@
 		 }"
 	Size: ~190 MB
 
-5. TensorFlow's Conversational Question Answering Challenge (CoQA)
-	URL: https://www.tensorflow.org/datasets/catalog/coqa
+5. Stanfords's Conversational Question Answering Challenge (CoQA)
+	URL: https://stanfordnlp.github.io/coqa/
 	Citation: 
 		"@misc{reddy2018coqa,
 		 title={CoQA: A Conversational Question Answering Challenge},
@@ -73,7 +73,7 @@
 		 eprint={1808.07042},
 		 archivePrefix={arXiv},
 		 primaryClass={cs.CL}"
-	Size: ~18.28 MiB
+	Size: ~74 MB
 }
 
 Additional resources:
