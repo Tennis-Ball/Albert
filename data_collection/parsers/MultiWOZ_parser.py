@@ -10,5 +10,3 @@ def parse_MultiWOZ_ds() -> [str]:
 
 def process_convo(convo: [str]) -> str:
     return " ".join([f"Spkr1: {line}" if i%2==0  else f"Spkr2: {line}" for i, line in enumerate(convo)])
-
-print(parse_MultiWOZ_ds()[0])

@@ -13,5 +13,3 @@ def processLine(line:str) -> str:
     if len(parts) < 2:
         return
     return "Spkr1: " + parts[0] + " Spkr2: " + parts[1]
-
-print(parse_wiki_QA_ds())
