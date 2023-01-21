@@ -22,3 +22,5 @@ with open("data.json", "w", encoding="utf-8") as f:
     f.truncate(0)
     json.dump({"data": data}, f, ensure_ascii=True, indent=4)
 print("all data successfully processed")
+
+
