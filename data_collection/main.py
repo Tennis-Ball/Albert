@@ -23,8 +23,7 @@ with open("data.json", "w", encoding="utf-8") as f:
     f.truncate(0)
     spaces = re.compile("\s+")
     punctuation = re.compile("([.,?!():])")
-    processedData = [re.sub(spaces ," ",re.sub(punctuation, r" \1", d)) for d in data if isinstance(d, str)]
+    possesives = re.compile("'s")
+    processedData = [re.sub(spaces, " ", re.sub(punctuation, r" \1", re.sub(possesives, " 's", d))) for d in data if isinstance(d, str)]
     json.dump({"data": processedData}, f, ensure_ascii=True, indent=4)
 print("all data successfully processed")
-
-
