@@ -4,6 +4,7 @@ from parsers.meta_convo_parser import parse_meta_convo_ds
 from parsers.wiki_QA_parser import parse_wiki_QA_ds
 from parsers.MultiWOZ_parser import parse_MultiWOZ_ds
 from parsers.CoQA_parser import parse_CoQA_ds
+import re
 import json
 
 
@@ -20,7 +21,10 @@ print("parsed coqa ds")
 
 with open("data.json", "w", encoding="utf-8") as f:
     f.truncate(0)
-    json.dump({"data": data}, f, ensure_ascii=True, indent=4)
+    spaces = re.compile("\s+")
+    punctuation = re.compile("([.,?!():])")
+    processedData = [re.sub(spaces ," ",re.sub(punctuation, r" \1", d)) for d in data if isinstance(d, str)]
+    json.dump({"data": processedData}, f, ensure_ascii=True, indent=4)
 print("all data successfully processed")
 
 

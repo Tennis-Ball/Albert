@@ -2,21 +2,24 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
+import re
 # import tensorflow as tf
 
 
-def get_data() -> [str]:
+def get_data() -> list[str]:
     file = open("../data_collection/data.json").read()
-    return list(filter(lambda x:x != None and len(x) < 2100 and len(x) > 30,json.loads(file)["data"]))
+    return list(filter(lambda x: len(x) < 2100 and len(x) > 30,json.loads(file)["data"]))
 
 
 # size in percentage of total data, split in form (train%, test%, val%)
-def process_data(size: int=100, split: (int,int,int)=(80, 15, 5)) -> object:
+def process_data(size: int=100, split: tuple[int,int,int]=(80, 15, 5)) -> object:
     data = get_data()  # get data
+    print(data)
+
     np.random.shuffle(data)
     data = data[:int(len(data)*(size/100))]  # truncate to specified size
     data = np.array(data)  # convert to array
-    
+
     # calculate data split indices
     train_i = int(len(data)*(split[0]/100))
     test_i = int(len(data)*(split[1]/100)) + train_i

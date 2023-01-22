@@ -12,4 +12,4 @@ def parse_CMU_QA_ds() -> [str]:
     df = df[df["Answer"].notna()]
     df = df.drop_duplicates("Question", keep="last")
 
-    return [f"Spkr1: {row['Question']} Spkr2: {row['Answer']}" for i, row in df.iterrows()]
+    return [f"Spkr1 {row['Question']} Spkr2 {row['Answer']}" for i, row in df.iterrows()]
