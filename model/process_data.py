@@ -6,13 +6,13 @@ import re
 # import tensorflow as tf
 
 
-def get_data() -> list[str]:
+def get_data():
     file = open("../data_collection/data.json").read()
     return list(filter(lambda x: len(x) < 2100 and len(x) > 30,json.loads(file)["data"]))
 
 
 # size in percentage of total data, split in form (train%, test%, val%)
-def process_data(size: int=100, split: tuple[int,int,int]=(80, 15, 5)) -> object:
+def process_data(size=100, split=(80, 15, 5)):
     data = get_data()  # get data
     print(data)
 
@@ -35,4 +35,6 @@ def hist():
     plt.show()
     print(len(data))
 
-process_data(10, (85, 10, 5))
+
+if __name__ == "__main__":
+    process_data(10, (85, 10, 5))
