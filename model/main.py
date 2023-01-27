@@ -2,62 +2,70 @@
 # !! SWITCHED TO PYTHON V3.8
 from process_data import process_data
 import tensorflow as tf
+assert tf.__version__.startswith('2')
+tf.random.set_seed(1234)
 from tensorflow.keras import layers, activations, models, preprocessing
 import numpy as np
 from tf_utils import *
-import pydot
-import graphviz
+import tensorflow_datasets as tfds
 
 
-def encoder_layer(units, d_model, num_heads, dropout, name="encoder_layer"):
-    inputs = tf.keras.Input(shape=(None, d_model), name="inputs")
-    padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
+##############################Maybe wrap in function in utils?#######################
+# Build tokenizer using tfds for both questions and answers
+tokenizer = tfds.features.text.SubwordTextEncoder.build_from_corpus(
+    questions + answers, target_vocab_size=2**13)
 
-    attention = MultiHeadAttention(
-        d_model, num_heads, name="attention")({
-            'query': inputs,
-            'key': inputs,
-            'value': inputs,
-            'mask': padding_mask
-        })
-    attention = tf.keras.layers.Dropout(rate=dropout)(attention)
-    attention = tf.keras.layers.LayerNormalization(
-        epsilon=1e-6)(inputs + attention)
+# Define start and end token to indicate the start and end of a sentence
+START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 
-    outputs = tf.keras.layers.Dense(units=units, activation='relu')(attention)
-    outputs = tf.keras.layers.Dense(units=d_model)(outputs)
-    outputs = tf.keras.layers.Dropout(rate=dropout)(outputs)
-    outputs = tf.keras.layers.LayerNormalization(
-        epsilon=1e-6)(attention + outputs)
+# Vocabulary size plus start and end token
+VOCAB_SIZE = tokenizer.vocab_size + 2
+questions, answers = load_conversations()
+questions, answers = tokenize_and_filter(questions, answers)
 
-    return tf.keras.Model(
-        inputs=[inputs, padding_mask], outputs=outputs, name=name)
+BATCH_SIZE = 64
+BUFFER_SIZE = 20000
 
+# decoder inputs use the previous target as input
+# remove START_TOKEN from targets
+dataset = tf.data.Dataset.from_tensor_slices((
+    {
+        'inputs': questions,
+        'dec_inputs': answers[:, :-1]
+    },
+    {
+        'outputs': answers[:, 1:]
+    },
+))
 
-def encoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name="encoder"):
-    inputs = tf.keras.Input(shape=(None,), name="inputs")
-    padding_mask = tf.keras.Input(shape=(1, 1, None), name="padding_mask")
+dataset = dataset.cache()
+dataset = dataset.shuffle(BUFFER_SIZE)
+dataset = dataset.batch(BATCH_SIZE)
+dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+#######################################################################
 
-    embeddings = tf.keras.layers.Embedding(vocab_size, d_model)(inputs)
-    embeddings *= tf.math.sqrt(tf.cast(d_model, tf.float32))
-    embeddings = PositionalEncoding(vocab_size, d_model)(embeddings)
+NUM_LAYERS = 2
+D_MODEL = 256
+NUM_HEADS = 8
+UNITS = 512
+DROPOUT = 0.1
 
-    outputs = tf.keras.layers.Dropout(rate=dropout)(embeddings)
+model = transformer(
+    vocab_size=VOCAB_SIZE,
+    num_layers=NUM_LAYERS,
+    units=UNITS,
+    d_model=D_MODEL,
+    num_heads=NUM_HEADS,
+    dropout=DROPOUT)
 
-    for i in range(num_layers):
-        outputs = encoder_layer(
-            units=units,
-            d_model=d_model,
-            num_heads=num_heads,
-            dropout=dropout,
-            name="encoder_layer_{}".format(i),
-        )([outputs, padding_mask])
+learning_rate = CustomSchedule(D_MODEL)
 
-    return tf.keras.Model(
-        inputs=[inputs, padding_mask], outputs=outputs, name=name)
+optimizer = tf.keras.optimizers.Adam(
+    learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 
+model.compile(optimizer=optimizer, loss=loss_function, metrics=[accuracy])
 
-layer_test = encoder_layer(512, 3, 3, 0.05)
-print(layer_test.summary())
-encoder_test = encoder(500, 5, 512, 3, 3, 0.1)
-print(encoder_test.summary())
+EPOCHS = 20
+
+model.fit(dataset, epochs=EPOCHS)
+
