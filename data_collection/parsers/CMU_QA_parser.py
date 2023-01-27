@@ -8,7 +8,8 @@ def parse_CMU_QA_ds() -> [str]:
     df = pd.read_csv(file_path, sep="\t", encoding="unicode_escape")
 
     # process pandas df: drop cols, rm null answers, drop dupes
-    df = df.drop(["ArticleTitle", "DifficultyFromQuestioner", "DifficultyFromAnswerer", "ArticleFile"], axis=1)
+    df = df.drop(["ArticleTitle", "DifficultyFromQuestioner",
+                 "DifficultyFromAnswerer", "ArticleFile"], axis=1)
     df = df[df["Answer"].notna()]
     df = df.drop_duplicates("Question", keep="last")
 
