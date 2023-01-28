@@ -40,10 +40,8 @@ def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=2100, DATA_SIZE=1):
     return dataset, tokenizer, VOCAB_SIZE, START_TOKEN, END_TOKEN
 
 def preprocess_sentence(sentence):
-    # EXAMPLE PREPROCESSING, NOT FINAL
-    sentence = sentence.lower().strip()
+    sentence = sentence.strip()
     # creating a space between a word and the punctuation following it
-    # eg: "he is a boy." => "he is a boy ."
     sentence = re.sub(r"([?.!,])", r" \1 ", sentence)
     sentence = re.sub(r'[" "]+', " ", sentence)
     # replacing everything with space except (a-z, A-Z, ".", "?", "!", ",")
@@ -338,8 +336,8 @@ def transformer(vocab_size, num_layers, units, d_model, num_heads, dropout, name
     return tf.keras.Model(inputs=[inputs, dec_inputs], outputs=outputs, name=name)
 
 
-# TODO: specify MAX_LENGTH in compile
-def loss_function(y_true, y_pred, MAX_LENGTH=2100):
+# TODO: specify MAX_LENGTH in compile (orig=2100)
+def loss_function(y_true, y_pred, MAX_LENGTH=40):
     y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
 
     loss = tf.keras.losses.SparseCategoricalCrossentropy(
@@ -367,8 +365,8 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
         return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
 
 
-# TODO: specify MAX_LENGTH in compile
-def accuracy(y_true, y_pred, MAX_LENGTH=2100):
+# TODO: specify MAX_LENGTH in compile (orig=2100)
+def accuracy(y_true, y_pred, MAX_LENGTH=40):
     # ensure labels have shape (batch_size, MAX_LENGTH - 1)
     y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
     accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred)
@@ -400,7 +398,7 @@ def evaluate(sentence, model, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH):
     return tf.squeeze(output, axis=0)
 
 
-def predict(sentence, tokenizer, model, START_TOKEN, END_TOKEN, MAX_LENGTH):
+def predict(sentence, model, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH):
     prediction = evaluate(sentence, model, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
     predicted_sentence = tokenizer.decode(
         [i for i in prediction if i < tokenizer.vocab_size])
