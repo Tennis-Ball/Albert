@@ -14,7 +14,6 @@ def get_data():
 # size in percentage of total data, split in form (train%, test%, val%)
 def process_data(size=100, split=(80, 15, 5)):
     data = get_data()  # get data
-    print(data)
 
     np.random.shuffle(data)
     data = data[:int(len(data)*(size/100))]  # truncate to specified size
@@ -24,7 +23,7 @@ def process_data(size=100, split=(80, 15, 5)):
     train_i = int(len(data)*(split[0]/100))
     test_i = int(len(data)*(split[1]/100)) + train_i
     train, test, val = data[:train_i], data[train_i:test_i], data[test_i:]  # split
-    print(len(train), len(test), len(val))
+    print("train/test/val split:", len(train), len(test), len(val))
 
     return train, test, val
 

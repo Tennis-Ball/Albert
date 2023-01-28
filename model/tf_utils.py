@@ -1,6 +1,43 @@
+from process_data import process_data
+import tensorflow_datasets as tfds
 import tensorflow as tf
+assert tf.__version__.startswith('2')
+tf.random.set_seed(1234)
 import re
 
+
+def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=2100, DATA_SIZE=1):
+    data, _, _ = process_data(DATA_SIZE, (100, 0, 0))
+    # Build tokenizer using tfds for both questions and answers
+    tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
+        data, target_vocab_size=2**13)
+
+    # Define start and end token to indicate the start and end of a sentence
+    START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
+
+    # Vocabulary size plus start and end token
+    VOCAB_SIZE = tokenizer.vocab_size + 2
+    questions, answers = data, data
+    questions, answers = tokenize_and_filter(questions, answers, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
+
+    # decoder inputs use the previous target as input
+    # remove START_TOKEN from targets
+    dataset = tf.data.Dataset.from_tensor_slices((
+        {
+            'inputs': questions,
+            'dec_inputs': answers[:, :-1]
+        },
+        {
+            'outputs': answers[:, 1:]
+        },
+    ))
+
+    dataset = dataset.cache()
+    dataset = dataset.shuffle(BUFFER_SIZE)
+    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
+
+    return dataset, tokenizer, VOCAB_SIZE, START_TOKEN, END_TOKEN
 
 def preprocess_sentence(sentence):
     # EXAMPLE PREPROCESSING, NOT FINAL
@@ -17,25 +54,25 @@ def preprocess_sentence(sentence):
 
 
 # Tokenize, filter and pad sentences
-def tokenize_and_filter(inputs, outputs):
-  tokenized_inputs, tokenized_outputs = [], []
-  
-  for (sentence1, sentence2) in zip(inputs, outputs):
-    # tokenize sentence
-    sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
-    sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
-    # check tokenized sentence max length
-    if len(sentence1) <= MAX_LENGTH and len(sentence2) <= MAX_LENGTH:
-      tokenized_inputs.append(sentence1)
-      tokenized_outputs.append(sentence2)
-  
-  # pad tokenized sentences
-  tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
-      tokenized_inputs, maxlen=MAX_LENGTH, padding='post')
-  tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
-      tokenized_outputs, maxlen=MAX_LENGTH, padding='post')
-  
-  return tokenized_inputs, tokenized_outputs
+def tokenize_and_filter(inputs, outputs, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH):
+    tokenized_inputs, tokenized_outputs = [], []
+
+    for (sentence1, sentence2) in zip(inputs, outputs):
+        # tokenize sentence
+        sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
+        sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
+        # check tokenized sentence max length
+        if len(sentence1) <= MAX_LENGTH and len(sentence2) <= MAX_LENGTH:
+            tokenized_inputs.append(sentence1)
+            tokenized_outputs.append(sentence2)
+
+    # pad tokenized sentences
+    tokenized_inputs = tf.keras.preprocessing.sequence.pad_sequences(
+        tokenized_inputs, maxlen=MAX_LENGTH, padding='post')
+    tokenized_outputs = tf.keras.preprocessing.sequence.pad_sequences(
+        tokenized_outputs, maxlen=MAX_LENGTH, padding='post')
+
+    return tokenized_inputs, tokenized_outputs
 #################################################################
 
 
@@ -247,6 +284,19 @@ def decoder(vocab_size, num_layers, units, d_model, num_heads, dropout, name='de
         name=name)
 
 
+# Helper function for mask creation and making padded tokens
+def create_padding_mask(x):
+    mask = tf.cast(tf.math.equal(x, 0), tf.float32)
+    # (batch_size, 1, 1, sequence length)
+    return mask[:, tf.newaxis, tf.newaxis, :]
+def create_look_ahead_mask(x):
+    seq_len = tf.shape(x)[1]
+    look_ahead_mask = 1 - \
+        tf.linalg.band_part(tf.ones((seq_len, seq_len)), -1, 0)
+    padding_mask = create_padding_mask(x)
+    return tf.maximum(look_ahead_mask, padding_mask)
+
+
 def transformer(vocab_size, num_layers, units, d_model, num_heads, dropout, name="transformer"):
     inputs = tf.keras.Input(shape=(None,), name="inputs")
     dec_inputs = tf.keras.Input(shape=(None,), name="dec_inputs")
@@ -288,7 +338,8 @@ def transformer(vocab_size, num_layers, units, d_model, num_heads, dropout, name
     return tf.keras.Model(inputs=[inputs, dec_inputs], outputs=outputs, name=name)
 
 
-def loss_function(y_true, y_pred):
+# TODO: specify MAX_LENGTH in compile
+def loss_function(y_true, y_pred, MAX_LENGTH=2100):
     y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
 
     loss = tf.keras.losses.SparseCategoricalCrossentropy(
@@ -310,20 +361,21 @@ class CustomSchedule(tf.keras.optimizers.schedules.LearningRateSchedule):
         self.warmup_steps = warmup_steps
 
     def __call__(self, step):
-        arg1 = tf.math.rsqrt(step)
-        arg2 = step * (self.warmup_steps**-1.5)
+        arg1 = tf.math.rsqrt(float(step))
+        arg2 = float(step) * (self.warmup_steps**-1.5)
 
         return tf.math.rsqrt(self.d_model) * tf.math.minimum(arg1, arg2)
 
 
-def accuracy(y_true, y_pred):
+# TODO: specify MAX_LENGTH in compile
+def accuracy(y_true, y_pred, MAX_LENGTH=2100):
     # ensure labels have shape (batch_size, MAX_LENGTH - 1)
     y_true = tf.reshape(y_true, shape=(-1, MAX_LENGTH - 1))
     accuracy = tf.metrics.SparseCategoricalAccuracy()(y_true, y_pred)
     return accuracy
 
 
-def evaluate(sentence):
+def evaluate(sentence, model, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH):
     sentence = preprocess_sentence(sentence)
 
     sentence = tf.expand_dims(
@@ -348,8 +400,8 @@ def evaluate(sentence):
     return tf.squeeze(output, axis=0)
 
 
-def predict(sentence):
-    prediction = evaluate(sentence)
+def predict(sentence, tokenizer, model, START_TOKEN, END_TOKEN, MAX_LENGTH):
+    prediction = evaluate(sentence, model, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
     predicted_sentence = tokenizer.decode(
         [i for i in prediction if i < tokenizer.vocab_size])
     return predicted_sentence
