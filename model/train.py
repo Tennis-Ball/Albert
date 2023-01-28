@@ -10,30 +10,29 @@ tf.random.set_seed(1234)
 
 
 # ds consts  # int = original value
-BATCH_SIZE = 128  # 64
+BATCH_SIZE = 256  # 64
 BUFFER_SIZE = 20000  # 20000
 MAX_LENGTH = 40  # 2100
-DATA_SIZE = 1  # percentage of data to use
+DATA_SIZE = 50  # percentage of data to use
 
 # model consts
 NUM_LAYERS = 2  # 2
-D_MODEL = 64  # 256
+D_MODEL = 128  # 256
 NUM_HEADS = 8  # 8
-UNITS = 128  # 512
+UNITS = 256  # 512
 DROPOUT = 0.2  # 0.1
 learning_rate = CustomSchedule(D_MODEL)
 optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
 # Create a callback that saves the model's weights
 cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath="./saved/checkpoint/cp.ckpt",
-                                                 save_weights_only=False,
+                                                 save_weights_only=True,
                                                  verbose=1,
                                                  save_freq="epoch",
                                                  period=20)
 
 # trainings consts
-EPOCHS = 5
-
+EPOCHS = 50
 dataset, tokenizer, VOCAB_SIZE, START_TOKEN, END_TOKEN = initialize(
     BATCH_SIZE, BUFFER_SIZE, MAX_LENGTH, DATA_SIZE)
 print(f"Vocab size: {VOCAB_SIZE}")

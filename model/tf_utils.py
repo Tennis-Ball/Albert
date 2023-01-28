@@ -17,14 +17,14 @@ def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=2100, DATA_SIZE=1):
 
     # Vocabulary size plus start and end token
     VOCAB_SIZE = tokenizer.vocab_size + 2
-    questions, answers = data, data
-    questions, answers = tokenize_and_filter(questions, answers, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
+    prompts, answers = data, data
+    prompts, answers = tokenize_and_filter(prompts, answers, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
 
     # decoder inputs use the previous target as input
     # remove START_TOKEN from targets
     dataset = tf.data.Dataset.from_tensor_slices((
         {
-            'inputs': questions,
+            'inputs': prompts,
             'dec_inputs': answers[:, :-1]
         },
         {
