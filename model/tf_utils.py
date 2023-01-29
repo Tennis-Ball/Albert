@@ -6,7 +6,8 @@ tf.random.set_seed(1234)
 import re
 
 
-def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=2100, DATA_SIZE=1):
+# TODO: move bulk of parsing (in intitialize() + process_data()) to data_collection/main.py
+def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=40, DATA_SIZE=1):
     data, _, _ = process_data(DATA_SIZE, (100, 0, 0))
     # Build tokenizer using tfds for both questions and answers
     tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
@@ -17,19 +18,18 @@ def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=2100, DATA_SIZE=1):
 
     # Vocabulary size plus start and end token
     VOCAB_SIZE = tokenizer.vocab_size + 2
-    [questions,answers] = data
-    print(questions)
-    questions, answers = tokenize_and_filter(questions, answers, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
+    [prompts,responses] = data
+    prompts, responses = tokenize_and_filter(prompts, responses, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
 
     # decoder inputs use the previous target as input
     # remove START_TOKEN from targets
     dataset = tf.data.Dataset.from_tensor_slices((
         {
-            'inputs': questions,
-            'dec_inputs': answers[:, :-1]
+            'inputs': prompts,
+            'dec_inputs': responses[:, :-1]
         },
         {
-            'outputs': answers[:, 1:]
+            'outputs': responses[:, 1:]
         },
     ))
 
@@ -57,7 +57,6 @@ def tokenize_and_filter(inputs, outputs, tokenizer, START_TOKEN, END_TOKEN, MAX_
     tokenized_inputs, tokenized_outputs = [], []
 
     for (sentence1, sentence2) in zip(inputs, outputs):
-        # print(sentence1)
         # tokenize sentence
         sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
         sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
