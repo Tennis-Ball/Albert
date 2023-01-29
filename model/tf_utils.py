@@ -17,13 +17,7 @@ def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=2100, DATA_SIZE=1):
 
     # Vocabulary size plus start and end token
     VOCAB_SIZE = tokenizer.vocab_size + 2
-    questions = []
-    answers = []
-    for s in [list(filter(None,re.split("Spkr1 |Spkr2 ", s))) for s in data]:
-        if len(s) >= 2:
-            [q,a,*_] = s
-            questions.append(q)
-            answers.append(a)
+    [questions,answers] = data
     print(questions)
     questions, answers = tokenize_and_filter(questions, answers, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
 

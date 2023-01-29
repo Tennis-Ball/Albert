@@ -8,7 +8,7 @@ import re
 
 def get_data():
     file = open("../data_collection/data.json").read()
-    return list(filter(lambda x: len(x) < 2100 and len(x) > 30,json.loads(file)["data"]))
+    return file
 # original length cutoff = 2100
 
 # size in percentage of total data, split in form (train%, test%, val%)

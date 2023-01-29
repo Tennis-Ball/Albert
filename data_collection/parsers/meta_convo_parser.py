@@ -4,7 +4,7 @@ import json
 import re
 
 
-def parse_meta_convo_ds() -> [str]:
+def parse_meta_convo_ds():
     file_path = os.path.abspath(os.path.join(os.path.dirname(
         __file__), "..", "datasets/meta_convo_ds/CasualConversations_transcriptions(1).json"))
     raw = open(file_path, 'r', encoding="unicode_escape").read()

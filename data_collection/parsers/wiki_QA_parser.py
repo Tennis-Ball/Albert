@@ -2,7 +2,7 @@
 import os
 
 
-def parse_wiki_QA_ds() -> list[str]:
+def parse_wiki_QA_ds():
     file_path = os.path.abspath(os.path.join(os.path.dirname(
         __file__), "..", "datasets/WikiQACorpus/WikiQA-train.txt"))
     raw = open(file_path, 'r', encoding="unicode_escape").read()
@@ -11,7 +11,7 @@ def parse_wiki_QA_ds() -> list[str]:
     return processed
 
 
-def processLine(line: str) -> str:
+def processLine(line):
     parts = line.split("\t")[:2]
     if len(parts) < 2:
         return

@@ -2,7 +2,7 @@
 import pandas as pd
 
 
-def parse_CMU_QA_ds() -> [str]:
+def parse_CMU_QA_ds():
     # only first doc (of 3) for now
     file_path = "datasets/CMU_QA_ds/QA_doc_1.txt"
     df = pd.read_csv(file_path, sep="\t", encoding="unicode_escape")
