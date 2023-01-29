@@ -17,14 +17,21 @@ def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=2100, DATA_SIZE=1):
 
     # Vocabulary size plus start and end token
     VOCAB_SIZE = tokenizer.vocab_size + 2
-    prompts, answers = data, data
-    prompts, answers = tokenize_and_filter(prompts, answers, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
+    questions = []
+    answers = []
+    for s in [list(filter(None,re.split("Spkr1 |Spkr2 ", s))) for s in data]:
+        if len(s) >= 2:
+            [q,a,*_] = s
+            questions.append(q)
+            answers.append(a)
+    print(questions)
+    questions, answers = tokenize_and_filter(questions, answers, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
 
     # decoder inputs use the previous target as input
     # remove START_TOKEN from targets
     dataset = tf.data.Dataset.from_tensor_slices((
         {
-            'inputs': prompts,
+            'inputs': questions,
             'dec_inputs': answers[:, :-1]
         },
         {
@@ -56,6 +63,7 @@ def tokenize_and_filter(inputs, outputs, tokenizer, START_TOKEN, END_TOKEN, MAX_
     tokenized_inputs, tokenized_outputs = [], []
 
     for (sentence1, sentence2) in zip(inputs, outputs):
+        # print(sentence1)
         # tokenize sentence
         sentence1 = START_TOKEN + tokenizer.encode(sentence1) + END_TOKEN
         sentence2 = START_TOKEN + tokenizer.encode(sentence2) + END_TOKEN
