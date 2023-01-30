@@ -2,30 +2,26 @@
 import json
 import numpy as np
 import matplotlib.pyplot as plt
-import re
-# import tensorflow as tf
 
 
 def get_data():
     file = open("../data_collection/data.json").read()
-    return file
-# original length cutoff = 2100
+    return json.loads(file)
 
 # size in percentage of total data, split in form (train%, test%, val%)
-def process_data(size=100, split=(80, 15, 5)):
+def process_data(size=1):
     data = get_data()  # get data
-
+    data = list(zip(data["data"][0], data["data"][1]))  # (prompts, responses)
     np.random.shuffle(data)
-    data = data[:int(len(data)*(size/100))]  # truncate to specified size
-    data = np.array(data)  # convert to array
+    prompts, responses = zip(*data)  # unzip
 
-    # calculate data split indices
-    train_i = int(len(data)*(split[0]/100))
-    test_i = int(len(data)*(split[1]/100)) + train_i
-    train, test, val = data[:train_i], data[train_i:test_i], data[test_i:]  # split
-    print("train/test/val split:", len(train), len(test), len(val))
+    prompts = prompts[:int(len(prompts)*(size/100))]  # truncate to specified size
+    responses = responses[:int(len(responses)*(size/100))]  # truncate to specified size
+    prompts = np.array(prompts)  # convert to array
+    responses = np.array(responses)  # convert to array
+    print(f"Data points: {len(prompts)}")
 
-    return train, test, val
+    return prompts, responses
 
 
 def hist():
@@ -36,4 +32,4 @@ def hist():
 
 
 if __name__ == "__main__":
-    process_data(10, (85, 10, 5))
+    process_data(10)

@@ -1,7 +1,5 @@
 # The main script which declares model architecture and trains
 # !! SWITCHED TO PYTHON V3.8
-# Test with 50% data, length 20, BS 128, 64->128 drop 0.2 for 100 eps: acc 0.7572, loss 0.0638
-from process_data import process_data
 from tf_utils import *
 import tensorflow_datasets as tfds
 import tensorflow as tf
@@ -10,17 +8,17 @@ tf.random.set_seed(1234)
 
 
 # ds consts  # int = original value
-BATCH_SIZE = 128  # 64
+BATCH_SIZE = 256  # 64
 BUFFER_SIZE = 20000  # 20000
 MAX_LENGTH = 40  # 2100
-DATA_SIZE = 1  # percentage of data to use
+DATA_SIZE = 75  # percentage of data to use
 
 # model consts
 NUM_LAYERS = 2  # 2
-D_MODEL = 64  # 256
-NUM_HEADS = 8  # 8
-UNITS = 128  # 512
-DROPOUT = 0.2  # 0.1
+D_MODEL = 256  # 256
+NUM_HEADS = 4  # 8
+UNITS = 512  # 512
+DROPOUT = 0.1  # 0.1
 learning_rate = CustomSchedule(D_MODEL)
 optimizer = tf.keras.optimizers.Adam(
     learning_rate, beta_1=0.9, beta_2=0.98, epsilon=1e-9)
@@ -32,7 +30,7 @@ cp_callback = tf.keras.callbacks.ModelCheckpoint(filepath="./saved/checkpoint/cp
                                                  period=20)
 
 # trainings consts
-EPOCHS = 50
+EPOCHS = 100
 dataset, tokenizer, VOCAB_SIZE, START_TOKEN, END_TOKEN = initialize(
     BATCH_SIZE, BUFFER_SIZE, MAX_LENGTH, DATA_SIZE)
 print(f"Vocab size: {VOCAB_SIZE}")

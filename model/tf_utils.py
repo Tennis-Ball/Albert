@@ -4,21 +4,20 @@ import tensorflow as tf
 assert tf.__version__.startswith('2')
 tf.random.set_seed(1234)
 import re
+import numpy as np
 
 
-# TODO: move bulk of parsing (in intitialize() + process_data()) to data_collection/main.py
 def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=40, DATA_SIZE=1):
-    data, _, _ = process_data(DATA_SIZE, (100, 0, 0))
+    prompts, responses = process_data(DATA_SIZE)
     # Build tokenizer using tfds for both questions and answers
     tokenizer = tfds.deprecated.text.SubwordTextEncoder.build_from_corpus(
-        data, target_vocab_size=2**13)
+        list(prompts)+list(responses), target_vocab_size=2**13)
 
     # Define start and end token to indicate the start and end of a sentence
     START_TOKEN, END_TOKEN = [tokenizer.vocab_size], [tokenizer.vocab_size + 1]
 
     # Vocabulary size plus start and end token
     VOCAB_SIZE = tokenizer.vocab_size + 2
-    [prompts,responses] = data
     prompts, responses = tokenize_and_filter(prompts, responses, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH)
 
     # decoder inputs use the previous target as input

@@ -37,3 +37,4 @@ with open("data.json", "w", encoding="utf-8") as f:
     qaData = list(map(list, zip(*splitUpData)))
     json.dump({"data": qaData}, f, ensure_ascii=True, indent=4)
 print("all data successfully processed")
+    
