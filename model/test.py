@@ -1,8 +1,15 @@
 import tensorflow as tf
 
 
-# Recreate the exact same model, including its weights and the optimizer
-new_model = tf.keras.models.load_model('my_model.h5')
+mode = 0  # 0=from checkpoint, 1=from last full save
 
-# Show the model architecture
-new_model.summary()
+if mode == 0:
+    from train import *
+    model.load_weights("./saved/checkpoint/cp.ckpt")
+    print(predict("How many people are in the world today ?", model, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH))
+else:
+    # Recreate the exact same model, including its weights and the optimizer
+    model = tf.keras.models.load_model('my_model.h5')
+    # Show the model architecture
+    model.summary()
+    print(predict("How many people are in the world today ?", model, tokenizer, START_TOKEN, END_TOKEN, MAX_LENGTH))
