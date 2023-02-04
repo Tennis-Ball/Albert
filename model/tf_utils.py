@@ -4,7 +4,6 @@ import tensorflow as tf
 assert tf.__version__.startswith('2')
 tf.random.set_seed(1234)
 import re
-import numpy as np
 
 
 def initialize(BATCH_SIZE=64, BUFFER_SIZE=20000, MAX_LENGTH=40, DATA_SIZE=1):

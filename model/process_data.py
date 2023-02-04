@@ -1,6 +1,7 @@
 # A processing script for main.py
 import json
 import numpy as np
+np.random.seed(1234)
 import matplotlib.pyplot as plt
 
 
