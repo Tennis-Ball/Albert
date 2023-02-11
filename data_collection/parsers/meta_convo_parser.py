@@ -18,4 +18,6 @@ def parse_meta_convo_ds():
     firstSpeakerRegex = re.compile('\[secondary_.*?_secondary\]')
 
     secondSpeakerRegex = re.compile('\[primary.*?_primary\]')
-    return [re.sub(extraTagsRegex, '', re.sub(secondSpeakerRegex, 'Spkr2', re.sub(firstSpeakerRegex, 'Spkr1', data))) for data in transcripts]
+
+    percentMarker = re.compile(' % ')
+    return [re.sub(percentMarker, ' ', re.sub(extraTagsRegex, '', re.sub(secondSpeakerRegex, 'Spkr2', re.sub(firstSpeakerRegex, 'Spkr1', data)))) for data in transcripts]

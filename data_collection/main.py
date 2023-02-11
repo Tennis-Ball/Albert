@@ -22,19 +22,27 @@ print("parsed coqa ds")
 with open("data.json", "w", encoding="utf-8") as f:
     f.truncate(0)
     spaces = re.compile("\s+")
-    punctuation = re.compile("([.,?!():])")
+    punctuation = re.compile("([.,?!():%$;])")
     possesives = re.compile("'s")
-    formattedData = [re.sub(spaces, " ", re.sub(punctuation, r" \1", re.sub(possesives, " 's", d))) for d in data if isinstance(d, str)]
+    ellipsis = re.compile("\. \. \.")
+    formattedData = [ 
+        re.sub(ellipsis, "...", 
+        re.sub(spaces, " ", 
+        re.sub(punctuation, r" \1 ", 
+        re.sub(possesives, " 's", d))))
+            for d in data if isinstance(d, str)
+    ]
 
     def splitData(text):
         parts = list(filter(None,re.split("Spkr1 |Spkr2 ", text)))
         if(len(parts)>=2):
             splitUp = (parts[0],parts[1])
-            if(not (splitUp[0].isspace() and splitUp[1].isspace())):
+            if(not (splitUp[0].isspace() or splitUp[1].isspace())):
                 return splitUp
 
     splitUpData = list(filter(None,[splitData(d) for d in formattedData]))
     qaData = list(map(list, zip(*splitUpData)))
     json.dump({"data": qaData}, f, ensure_ascii=True, indent=4)
+    
 print("all data successfully processed")
     
