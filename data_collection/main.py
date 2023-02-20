@@ -6,6 +6,7 @@ from parsers.MultiWOZ_parser import parse_MultiWOZ_ds
 from parsers.CoQA_parser import parse_CoQA_ds
 import re
 import json
+import random
 
 
 data = parse_CMU_QA_ds()
@@ -20,29 +21,36 @@ data += parse_CoQA_ds()
 print("parsed coqa ds")
 
 with open("data.json", "w", encoding="utf-8") as f:
+    #clears the file
     f.truncate(0)
-    spaces = re.compile("\s+")
-    punctuation = re.compile("([.,?!():%$;])")
-    possesives = re.compile("'s")
-    ellipsis = re.compile("\. \. \.")
-    formattedData = [ 
-        re.sub(ellipsis, "...", 
-        re.sub(spaces, " ", 
-        re.sub(punctuation, r" \1 ", 
-        re.sub(possesives, " 's", d))))
-            for d in data if isinstance(d, str)
-    ]
 
-    def splitData(text):
-        parts = list(filter(None,re.split("Spkr1 |Spkr2 ", text)))
-        if(len(parts)>=2):
-            splitUp = (parts[0],parts[1])
-            if(not (splitUp[0].isspace() or splitUp[1].isspace())):
-                return splitUp
+    prompts = []
+    responses = []
 
-    splitUpData = list(filter(None,[splitData(d) for d in formattedData]))
-    qaData = list(map(list, zip(*splitUpData)))
-    json.dump({"data": qaData}, f, ensure_ascii=True, indent=4)
-    
+    for conversation in data:
+        if type(conversation) != str: 
+            continue
+
+        spaces = re.compile("\s+")
+        punctuation = re.compile("([.,?!():%$;])")
+        possesives = re.compile("'s")
+        ellipsis = re.compile("\. \. \.")
+
+        conversation = \
+            re.sub(ellipsis, "...", 
+            re.sub(spaces, " ", 
+            re.sub(punctuation, r" \1 ", 
+            re.sub(possesives, " 's", conversation))))
+
+
+        parts = list(filter(lambda x: (x.strip() != ""),re.split("Spkr1 |Spkr2 ", conversation)))
+        if(len(parts) >= 2):
+            for i in range(len(parts)-1):
+                prompts.append(parts[i])
+                responses.append(parts[i+1])
+
+    json.dump({"prompts": prompts, "responses": responses}, f, ensure_ascii=True, indent=4)
+
+
 print("all data successfully processed")
     
