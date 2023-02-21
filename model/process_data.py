@@ -12,7 +12,7 @@ def get_data():
 # size in percentage of total data, split in form (train%, test%, val%)
 def process_data(size=1):
     data = get_data()  # get data
-    data = list(zip(data["data"][0], data["data"][1]))  # (prompts, responses)
+    data = list(zip(data["prompts"], data["responses"]))  # (prompts, responses)
     np.random.shuffle(data)
     prompts, responses = zip(*data)  # unzip
 
